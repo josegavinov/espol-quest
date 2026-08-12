@@ -1,0 +1,22 @@
+# Python / Flask
+backend-flask/.venv/
+__pycache__/
+*.py[cod]
+*.db
+.env
+
+# Ruby / Rails
+backend-rails/.bundle/
+backend-rails/vendor/bundle/
+backend-rails/log/*
+backend-rails/tmp/*
+backend-rails/storage/*
+backend-rails/db/*.sqlite3
+backend-rails/db/*.sqlite3-*
+!backend-rails/log/.keep
+!backend-rails/tmp/.keep
+
+# Sistema operativo / editores
+.DS_Store
+.idea/
+.vscode/
