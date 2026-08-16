@@ -11,6 +11,9 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "badges", force: :cascade do |t|
     t.string "key", null: false
     t.string "name", null: false
@@ -22,7 +25,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   end
 
   create_table "checkpoints", force: :cascade do |t|
-    t.integer "level_id", null: false
+    t.bigint "level_id", null: false
     t.string "code", null: false
     t.string "name", null: false
     t.integer "x", null: false
@@ -37,14 +40,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   end
 
   create_table "level_progresses", force: :cascade do |t|
-    t.integer "player_id", null: false
+    t.bigint "player_id", null: false
     t.integer "score", default: 0, null: false
     t.boolean "completed", default: false, null: false
     t.integer "missions_completed", default: 0, null: false
     t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "level_id", null: false
+    t.bigint "level_id", null: false
     t.integer "avatar_x", default: 0, null: false
     t.integer "avatar_y", default: 0, null: false
     t.integer "lives", default: 3, null: false
@@ -78,9 +81,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   end
 
   create_table "mission_answers", force: :cascade do |t|
-    t.integer "player_id", null: false
-    t.integer "mission_id", null: false
-    t.integer "question_id", null: false
+    t.bigint "player_id", null: false
+    t.bigint "mission_id", null: false
+    t.bigint "question_id", null: false
     t.integer "selected_option", null: false
     t.boolean "correct", default: false, null: false
     t.integer "points_awarded", default: 0, null: false
@@ -96,9 +99,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
 
   create_table "missions", force: :cascade do |t|
     t.string "code", null: false
-    t.integer "level_id", null: false
-    t.integer "checkpoint_id"
-    t.integer "badge_id"
+    t.bigint "level_id", null: false
+    t.bigint "checkpoint_id"
+    t.bigint "badge_id"
     t.string "title", null: false
     t.text "description", default: "", null: false
     t.string "kind", default: "trivia", null: false
@@ -113,7 +116,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   end
 
   create_table "platforms", force: :cascade do |t|
-    t.integer "level_id", null: false
+    t.bigint "level_id", null: false
     t.integer "x", null: false
     t.integer "y", null: false
     t.integer "width", null: false
@@ -126,8 +129,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   end
 
   create_table "player_badges", force: :cascade do |t|
-    t.integer "player_id", null: false
-    t.integer "badge_id", null: false
+    t.bigint "player_id", null: false
+    t.bigint "badge_id", null: false
     t.datetime "awarded_at", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -151,7 +154,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   end
 
   create_table "questions", force: :cascade do |t|
-    t.integer "mission_id", null: false
+    t.bigint "mission_id", null: false
     t.text "statement", null: false
     t.json "options", default: [], null: false
     t.integer "correct_option", null: false

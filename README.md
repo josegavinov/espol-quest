@@ -27,7 +27,7 @@ Gustavo Galindo. Proyecto de la materia **Lenguajes de Programación** (ESPOL).
 | Lenguaje | Ruby 3.2 |
 | Framework | Rails 7.1 (API mode) |
 | ORM | Active Record |
-| Base de datos | SQLite (desarrollo) · PostgreSQL 15 (objetivo) |
+| Base de datos | PostgreSQL 15 |
 | Puerto | 3000 |
 
 > **Cambio respecto al Avance 1.** Atendiendo la observación del docente sobre el
@@ -38,7 +38,25 @@ Gustavo Galindo. Proyecto de la materia **Lenguajes de Programación** (ESPOL).
 
 ## Puesta en marcha
 
-Requisito: **Ruby 3.2** (`ruby -v`).
+Requisitos: **Ruby 3.2** (`ruby -v`) y **PostgreSQL 15**.
+
+### Base de datos
+
+La forma más rápida, igual en los tres sistemas operativos, es un contenedor:
+
+```bash
+docker run -d --name espol-quest-db \
+  -e POSTGRES_USER=espol -e POSTGRES_PASSWORD=espol \
+  -e POSTGRES_DB=espol_quest_development \
+  -p 5432:5432 postgres:15
+```
+
+Para apagarlo: `docker stop espol-quest-db` · para borrarlo: `docker rm -f espol-quest-db`.
+
+Si prefieren instalarlo nativo (`brew install postgresql@15`, el instalador de
+Windows o `pacman -S postgresql`), creen el usuario y la contraseña `espol`.
+Cualquier valor se puede cambiar con las variables `POSTGRES_HOST`,
+`POSTGRES_PORT`, `POSTGRES_USER` y `POSTGRES_PASSWORD`.
 
 <details>
 <summary>Instalar Ruby 3.2</summary>
@@ -64,6 +82,7 @@ aceptando `ridk install` (opción 3). Los comandos se ejecutan en **Git Bash**.
 ```bash
 cd backend-rails
 bundle install
+bin/rails db:create
 bin/rails db:migrate
 bin/rails db:seed
 bin/rails server -p 3000     # http://127.0.0.1:3000
@@ -89,7 +108,7 @@ de las validaciones (400, 404, 422). En Windows se ejecutan desde **Git Bash**.
 | Método | Endpoint | RF | Responsable |
 |---|---|---|---|
 | GET | `/health` | — | base |
-| GET | `/levels?zona=&mundo=` | RF-02 | Kevin Gálvez |
+| GET | `/levels?zona=&mundo=&player_id=` | RF-02 | Kevin Gálvez |
 | GET | `/levels/<code>` | RF-01 | Kevin Gálvez |
 | POST | `/levels/<code>/state` | RF-01 | Kevin Gálvez |
 | GET | `/levels/<code>/state?player_id=` | RF-01 | Kevin Gálvez |
@@ -134,6 +153,5 @@ curl "http://127.0.0.1:3000/api/v1/ranking?facultad=FIEC"
 ## Pendiente para el Avance 2
 
 - Frontend Phaser.js + React (TypeScript) como PWA sobre Canvas HTML5.
-- Migración de la base de datos a PostgreSQL 15.
 - CMS de administración de trivias.
 - Autenticación (JWT) y pruebas automatizadas (minitest).
