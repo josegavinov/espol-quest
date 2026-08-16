@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# Pruebas del backend de Kevin Gálvez (RF-01 y RF-02) sobre el servicio Flask.
+# Pruebas del backend de Kevin Gálvez (RF-01 y RF-02) sobre el backend Rails.
 # Uso: ./scripts/pruebas_kevin.sh
 set -u
 
-BASE="${BASE:-http://127.0.0.1:5001/api/v1}"
+BASE="${BASE:-http://127.0.0.1:3000/api/v1}"
 
 pp() { python3 -m json.tool 2>/dev/null || cat; }
 titulo() { printf '\n\033[1;36m%s\033[0m\n' "── $1"; }
 
 echo "=============================================================="
-echo " ESPOL Quest · Servicio Principal de Juego (Flask)"
+echo " ESPOL Quest · Backend (Ruby on Rails)"
 echo " Responsable: Kevin Gálvez — RF-01 escenario/físicas, RF-02 selector"
 echo " Base URL: $BASE"
 echo "=============================================================="

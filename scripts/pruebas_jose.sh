@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# Pruebas del backend de José Gaviño (RF-03 y RF-04) sobre el servicio Flask.
+# Pruebas del backend de José Gaviño (RF-03 y RF-04) sobre el backend Rails.
 # Uso: ./scripts/pruebas_jose.sh
 set -u
 
-BASE="${BASE:-http://127.0.0.1:5001/api/v1}"
+BASE="${BASE:-http://127.0.0.1:3000/api/v1}"
 PLAYER="${PLAYER:-2}"
 
 pp() { python3 -m json.tool 2>/dev/null || cat; }
 titulo() { printf '\n\033[1;36m%s\033[0m\n' "── $1"; }
 
 echo "=============================================================="
-echo " ESPOL Quest · Servicio Principal de Juego (Flask)"
+echo " ESPOL Quest · Backend (Ruby on Rails)"
 echo " Responsable: José Gaviño — RF-03 respuestas, RF-04 misiones"
 echo " Base URL: $BASE   ·   player_id de prueba: $PLAYER"
 echo "=============================================================="
