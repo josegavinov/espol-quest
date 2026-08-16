@@ -36,23 +36,24 @@ class Mission < ApplicationRecord
 
   # Estado de la mision para un jugador: cuanto lleva y si ya la completo.
   def summary_for(player)
-    answers = mission_answers.where(player: player)
-    correctas = answers.where(correct: true).distinct.count(:question_id)
-
     {
       mission_code: code,
-      puntaje_obtenido: answers.sum(:points_awarded),
+      puntaje_obtenido: mission_answers.where(player: player).sum(:points_awarded),
       puntaje_maximo: max_points,
-      preguntas_correctas: correctas,
+      preguntas_correctas: correct_answers_count(player),
       preguntas_totales: questions.size,
-      completada: correctas == questions.size,
+      completada: solved_by?(player),
       insignia: badge&.key
     }
   end
 
   def solved_by?(player)
-    mission_answers.where(player: player, correct: true)
-                   .distinct.count(:question_id) == questions.size
+    correct_answers_count(player) == questions.size
+  end
+
+  # Preguntas distintas que el jugador ya acerto: los reintentos no suman.
+  def correct_answers_count(player)
+    mission_answers.where(player: player, correct: true).distinct.count(:question_id)
   end
 
   # Catalogo de misiones del nivel (RF-04).
@@ -74,7 +75,7 @@ class Mission < ApplicationRecord
   def as_detail
     as_summary.merge(
       level_code: level.code,
-      questions: questions.map(&:as_json_public)
+      questions: questions.map(&:as_detail)
     )
   end
 end

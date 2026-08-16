@@ -6,7 +6,7 @@ module Api
       # GET /api/v1/badges
       def index
         badges = Badge.order(:key)
-        render json: { count: badges.size, insignias: badges.map(&:as_json_public) }
+        render json: { count: badges.size, insignias: badges.map(&:as_detail) }
       end
     end
   end

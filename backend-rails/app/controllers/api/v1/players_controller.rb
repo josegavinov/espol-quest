@@ -10,7 +10,7 @@ module Api
 
       # POST /api/v1/players
       def create
-        player = Player.create!(player_params.merge(facultad: facultad))
+        player = Player.create!(player_params.merge(facultad: params[:facultad].to_s.upcase))
         render json: { message: "jugador_registrado", player: player.as_summary }, status: 201
       end
 
@@ -23,7 +23,7 @@ module Api
           player: player.as_summary,
           puntaje_total: answers.sum(:points_awarded),
           count: answers.size,
-          answers: answers.map(&:as_json_public)
+          answers: answers.map(&:as_detail)
         }
       end
 
@@ -33,10 +33,6 @@ module Api
         params.require(:nickname)
         params.require(:facultad)
         params.permit(:nickname, :email, :facultad)
-      end
-
-      def facultad
-        params[:facultad].to_s.upcase
       end
     end
   end

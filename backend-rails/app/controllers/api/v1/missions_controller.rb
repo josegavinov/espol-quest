@@ -46,7 +46,7 @@ module Api
 
         render json: {
           message: "respuesta_registrada",
-          answer: answer.as_json_public,
+          answer: answer.as_detail,
           feedback: question.feedback_for(answer.correct),
           resumen_mision: mission.summary_for(player)
         }, status: 201

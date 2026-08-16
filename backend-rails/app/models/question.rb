@@ -15,7 +15,7 @@ class Question < ApplicationRecord
   end
 
   # Se omite correct_option a proposito: el cliente no debe conocer la respuesta.
-  def as_json_public
+  def as_detail
     {
       id: id,
       statement: statement,

@@ -1,10 +1,9 @@
-# Respuesta enviada por el jugador, con su validacion y el puntaje otorgado.
 class MissionAnswer < ApplicationRecord
   belongs_to :player
   belongs_to :mission
   belongs_to :question
 
-  def as_json_public
+  def as_detail
     {
       id: id,
       player_id: player_id,

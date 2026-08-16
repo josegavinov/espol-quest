@@ -31,7 +31,7 @@ class Level < ApplicationRecord
   end
 
   # Payload completo que consume el motor Phaser para armar la escena (RF-01).
-  def as_scene
+  def as_detail
     {
       code: code,
       name: name,
@@ -42,8 +42,8 @@ class Level < ApplicationRecord
       physics: { gravity_y: gravity_y },
       spawn: { x: spawn_x, y: spawn_y },
       background_key: background_key,
-      platforms: platforms.map(&:as_json_public),
-      checkpoints: checkpoints.map(&:as_json_public)
+      platforms: platforms.map(&:as_detail),
+      checkpoints: checkpoints.map(&:as_detail)
     }
   end
 end

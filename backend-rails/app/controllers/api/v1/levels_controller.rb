@@ -20,7 +20,7 @@ module Api
 
       # GET /api/v1/levels/:code — escena completa que arma el motor Phaser.
       def show
-        render json: find_level!(params[:code]).as_scene
+        render json: find_level!(params[:code]).as_detail
       end
 
       # POST /api/v1/levels/:code/state — guarda la partida dentro del nivel.
@@ -29,19 +29,19 @@ module Api
         player = Player.find(state_params[:player_id])
         progress = player.level_progresses.find_or_initialize_by(level: level)
 
-        desconocidos = Array(state_params[:checkpoints_reached]) - level.checkpoint_codes
+        desconocidos = progress.unknown_checkpoints(state_params[:checkpoints_reached])
         if desconocidos.any?
           return render json: { error: "checkpoints_invalidos", detalle: desconocidos }, status: 422
         end
 
-        progress.reach(state_params[:checkpoints_reached])
-        progress.avatar_x = state_params.fetch(:avatar, {})[:x] || level.spawn_x
-        progress.avatar_y = state_params.fetch(:avatar, {})[:y] || level.spawn_y
-        progress.lives = state_params[:lives] || progress.lives
-        progress.elapsed_seconds = state_params[:elapsed_seconds] || progress.elapsed_seconds
-        progress.save!
+        progress.apply_state(
+          avatar: state_params.fetch(:avatar, {}),
+          checkpoints_reached: state_params[:checkpoints_reached],
+          lives: state_params[:lives],
+          elapsed_seconds: state_params[:elapsed_seconds]
+        ).save!
 
-        render json: { message: "estado_guardado", state: progress.as_json_public }, status: 201
+        render json: { message: "estado_guardado", state: progress.as_detail }, status: 201
       end
 
       # GET /api/v1/levels/:code/state?player_id= — para reanudar la partida.
@@ -49,7 +49,7 @@ module Api
         level = find_level!(params[:code])
         progress = LevelProgress.find_by!(level: level, player_id: params.require(:player_id))
 
-        render json: progress.as_json_public
+        render json: progress.as_detail
       end
 
       private

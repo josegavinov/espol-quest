@@ -9,7 +9,7 @@ class Checkpoint < ApplicationRecord
   validates :code, uniqueness: true
   validates :kind, inclusion: { in: KINDS }
 
-  def as_json_public
+  def as_detail
     {
       code: code,
       name: name,

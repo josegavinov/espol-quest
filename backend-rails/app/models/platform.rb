@@ -6,7 +6,7 @@ class Platform < ApplicationRecord
 
   validates :kind, inclusion: { in: KINDS }
 
-  def as_json_public
+  def as_detail
     {
       id: id,
       x: x,

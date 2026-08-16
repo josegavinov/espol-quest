@@ -45,10 +45,13 @@ class Player < ApplicationRecord
     )
   end
 
+  # Promedio de exploracion sobre los niveles jugados. Precarga los checkpoints
+  # porque cada nivel los necesita para calcular su porcentaje.
   def exploration_pct
-    return 0.0 if level_progresses.empty?
+    jugados = progress_with_checkpoints
+    return 0.0 if jugados.empty?
 
-    (level_progresses.sum(&:exploration_pct) / level_progresses.size).round(2)
+    (jugados.sum(&:exploration_pct) / jugados.size).round(2)
   end
 
   # Fila de la tabla de clasificacion (RF-06).
@@ -73,10 +76,18 @@ class Player < ApplicationRecord
       puntaje_total: total_score,
       niveles_superados: levels_completed,
       exploracion_promedio_pct: exploration_pct,
-      niveles: level_progresses.includes(level: :checkpoints).map(&:as_json_public),
+      niveles: progress_with_checkpoints.map(&:as_detail),
       insignias: player_badges.includes(:badge).map do |pb|
-        pb.badge.as_json_public.merge(obtenida_el: pb.awarded_at)
+        pb.badge.as_detail.merge(obtenida_el: pb.awarded_at)
       end
     }
+  end
+
+  private
+
+  # Sin memoizar a proposito: guardar el resultado en la instancia lo dejaria
+  # obsoleto en cuanto se registre un nivel nuevo sobre el mismo objeto.
+  def progress_with_checkpoints
+    level_progresses.includes(level: :checkpoints).to_a
   end
 end

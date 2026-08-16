@@ -18,11 +18,26 @@ class LevelProgress < ApplicationRecord
     self.completed_at ||= Time.current
   end
 
-  # Acumula los checkpoints alcanzados sin duplicarlos, respetando el orden en
-  # que aparecen en el nivel.
+  # Guarda la partida dentro del nivel. Los checkpoints se acumulan sin
+  # duplicarlos, respetando el orden en que aparecen en el nivel; lo que no se
+  # envia conserva su valor anterior.
+  def apply_state(avatar: {}, checkpoints_reached: [], lives: nil, elapsed_seconds: nil)
+    reach(checkpoints_reached)
+    self.avatar_x = avatar[:x] || level.spawn_x
+    self.avatar_y = avatar[:y] || level.spawn_y
+    self.lives = lives || self.lives
+    self.elapsed_seconds = elapsed_seconds || self.elapsed_seconds
+    self
+  end
+
   def reach(codes)
     alcanzados = checkpoints_reached.to_a | Array(codes)
     self.checkpoints_reached = level.checkpoint_codes & alcanzados
+  end
+
+  # Codigos que no existen en el nivel; el controlador los rechaza con 422.
+  def unknown_checkpoints(codes)
+    Array(codes) - level.checkpoint_codes
   end
 
   # Se deriva de los checkpoints alcanzados en vez de guardarse, para que no
@@ -34,7 +49,7 @@ class LevelProgress < ApplicationRecord
     (checkpoints_reached.size * 100.0 / total).round(2)
   end
 
-  def as_json_public
+  def as_detail
     {
       level_code: level.code,
       puntaje: score,

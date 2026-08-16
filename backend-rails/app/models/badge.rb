@@ -8,7 +8,7 @@ class Badge < ApplicationRecord
   validates :key, presence: true, uniqueness: true
   validates :name, presence: true
 
-  def as_json_public
+  def as_detail
     { key: key, nombre: name, descripcion: description, icono: icon }
   end
 end
