@@ -1,6 +1,6 @@
-# Tabla de clasificación global y por facultad.
+# Tabla de clasificacion global y por facultad.
 # Responsable: Jorge del Campo
-# RF-06 Consultar tabla de clasificación (ranking) (lectura)
+# RF-06 Consultar tabla de clasificacion (ranking)
 module Api
   module V1
     class RankingController < ApplicationController
@@ -9,20 +9,13 @@ module Api
 
       # GET /api/v1/ranking?facultad=FIEC&limit=10
       def index
-        scope = Profile.all
         facultad = params[:facultad].presence&.upcase
-        scope = scope.where(facultad: facultad) if facultad
+        scope = facultad ? Player.where(facultad: facultad) : Player.all
 
-        limit = params[:limit].to_i
-        limit = DEFAULT_LIMIT if limit <= 0
-        limit = MAX_LIMIT if limit > MAX_LIMIT
-
-        profiles = scope.order(total_score: :desc, levels_completed: :desc, nickname: :asc)
-                        .limit(limit)
-
-        tabla = profiles.each_with_index.map do |profile, index|
-          profile.as_summary.merge(posicion: index + 1)
-        end
+        tabla = scope.order(total_score: :desc, levels_completed: :desc, nickname: :asc)
+                     .limit(page_limit)
+                     .each_with_index
+                     .map { |player, index| player.as_summary.merge(posicion: index + 1) }
 
         render json: {
           alcance: facultad ? "facultad:#{facultad}" : "global",
@@ -30,6 +23,15 @@ module Api
           mostrados: tabla.size,
           tabla: tabla
         }
+      end
+
+      private
+
+      def page_limit
+        limit = params[:limit].to_i
+        return DEFAULT_LIMIT if limit <= 0
+
+        [limit, MAX_LIMIT].min
       end
     end
   end
