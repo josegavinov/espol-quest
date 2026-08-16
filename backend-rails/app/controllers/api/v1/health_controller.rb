@@ -4,7 +4,7 @@ module Api
       # GET /api/v1/health
       def show
         render json: {
-          service: "espol-quest-admin-service",
+          service: "espol-quest-api",
           version: "0.1.0",
           status: "ok",
           database: ActiveRecord::Base.connection_db_config.adapter,
