@@ -159,16 +159,16 @@ MISSIONS = [
 
 # Partidas de demostracion para que el ranking tenga datos visibles.
 DEMO_PROGRESS = [
-  { nickname: "kevin_g", level_code: "FIEC-01", score: 20, missions_completed: 1,
+  { nickname: "kevin_g", level_code: "FIEC-01", score: 20,
     completed: true, checkpoints: %w[FIEC-01-CP1 FIEC-01-CP2 FIEC-01-CP3],
     badges: %w[insignia_fiec insignia_novato] },
-  { nickname: "jorge_dc", level_code: "FIEC-01", score: 10, missions_completed: 0,
+  { nickname: "jorge_dc", level_code: "FIEC-01", score: 10,
     completed: false, checkpoints: %w[FIEC-01-CP1 FIEC-01-CP2],
     badges: %w[insignia_novato] },
-  { nickname: "novato01", level_code: "FIEC-01", score: 20, missions_completed: 1,
+  { nickname: "novato01", level_code: "FIEC-01", score: 20,
     completed: true, checkpoints: %w[FIEC-01-CP1 FIEC-01-CP2 FIEC-01-CP3],
     badges: %w[insignia_fiec insignia_novato] },
-  { nickname: "novato01", level_code: "BIB-01", score: 30, missions_completed: 1,
+  { nickname: "novato01", level_code: "BIB-01", score: 30,
     completed: true, checkpoints: %w[BIB-01-CP1 BIB-01-CP2],
     badges: %w[insignia_lector] }
 ].freeze
@@ -217,7 +217,7 @@ DEMO_PROGRESS.each do |raw|
   level = Level.find_by!(code: raw[:level_code])
 
   player.register_level_result(
-    level: level, score: raw[:score], missions_completed: raw[:missions_completed],
+    level: level, score: raw[:score],
     completed: raw[:completed], badge_keys: raw[:badges]
   )
 

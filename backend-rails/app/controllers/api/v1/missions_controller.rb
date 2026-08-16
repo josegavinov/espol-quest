@@ -31,7 +31,7 @@ module Api
         mission = find_mission!(params[:code])
         player = Player.find(answer_params[:player_id])
         question = mission.questions.find_by(id: answer_params[:question_id])
-        seleccion = answer_params[:selected_option].to_i
+        seleccion = integer_param(answer_params[:selected_option])
 
         if question.nil?
           return render json: { error: "pregunta_no_pertenece_a_la_mision" }, status: 422
@@ -41,13 +41,14 @@ module Api
                                 opciones_validas: (0...question.options.size).to_a }, status: 422
         end
 
-        answer = mission.register_answer(player: player, question: question,
-                                         selected_option: seleccion)
+        answer, awarded = mission.register_answer(player: player, question: question,
+                                                  selected_option: seleccion)
 
         render json: {
           message: "respuesta_registrada",
           answer: answer.as_detail,
           feedback: question.feedback_for(answer.correct),
+          insignias_otorgadas: awarded.map(&:key),
           resumen_mision: mission.summary_for(player)
         }, status: 201
       end

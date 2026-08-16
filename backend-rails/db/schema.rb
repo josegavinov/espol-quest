@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_16_151847) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   create_table "badges", force: :cascade do |t|
     t.string "key", null: false
     t.string "name", null: false
@@ -50,6 +50,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_151847) do
     t.integer "lives", default: 3, null: false
     t.integer "elapsed_seconds", default: 0, null: false
     t.json "checkpoints_reached", default: [], null: false
+    t.integer "mission_score", default: 0, null: false
     t.index ["level_id"], name: "index_level_progresses_on_level_id"
     t.index ["player_id", "level_id"], name: "index_level_progresses_on_player_id_and_level_id", unique: true
     t.index ["player_id"], name: "index_level_progresses_on_player_id"

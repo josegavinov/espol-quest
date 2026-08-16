@@ -15,8 +15,14 @@ class Level < ApplicationRecord
     checkpoints.map(&:code)
   end
 
-  # Payload liviano del selector de niveles (RF-02).
-  def as_summary
+  # Un nivel se desbloquea con el puntaje acumulado del jugador.
+  def unlocked_for?(player)
+    player.total_score >= required_score
+  end
+
+  # Payload liviano del selector de niveles (RF-02). Sin jugador se devuelve el
+  # catalogo completo como desbloqueado: es el catalogo, no la partida de nadie.
+  def as_summary(player = nil)
     {
       code: code,
       name: name,
@@ -25,6 +31,7 @@ class Level < ApplicationRecord
       order: order_index,
       difficulty: difficulty,
       required_score: required_score,
+      desbloqueado: player.nil? || unlocked_for?(player),
       description: description,
       checkpoints_count: checkpoints.size
     }

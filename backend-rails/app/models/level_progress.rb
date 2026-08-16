@@ -1,17 +1,24 @@
 # Avance de un jugador dentro de un nivel: estado de la partida (posicion,
 # vidas, checkpoints alcanzados) y resultado (puntaje, nivel superado).
+#
+# El puntaje del nivel tiene dos origenes y cada uno lo escribe un solo camino:
+# mission_score se deriva de las respuestas de trivia, score lo envia el juego
+# al terminar el nivel. total_points es la suma.
 class LevelProgress < ApplicationRecord
   belongs_to :player
   belongs_to :level
 
   validates :level_id, uniqueness: { scope: :player_id }
-  validates :score, :lives, :elapsed_seconds,
+  validates :score, :mission_score, :lives, :elapsed_seconds,
             numericality: { greater_than_or_equal_to: 0 }
 
+  def total_points
+    score + mission_score
+  end
+
   # El puntaje nunca baja: se conserva el mejor intento del jugador.
-  def keep_best(score:, missions_completed:, completed:)
+  def keep_best(score:, completed:)
     self.score = [self.score.to_i, score.to_i].max
-    self.missions_completed = [self.missions_completed.to_i, missions_completed.to_i].max
     return unless ActiveModel::Type::Boolean.new.cast(completed)
 
     self.completed = true
@@ -20,11 +27,11 @@ class LevelProgress < ApplicationRecord
 
   # Guarda la partida dentro del nivel. Los checkpoints se acumulan sin
   # duplicarlos, respetando el orden en que aparecen en el nivel; lo que no se
-  # envia conserva su valor anterior.
+  # envia conserva su valor anterior, y si nunca hubo posicion se usa el spawn.
   def apply_state(avatar: {}, checkpoints_reached: [], lives: nil, elapsed_seconds: nil)
     reach(checkpoints_reached)
-    self.avatar_x = avatar[:x] || level.spawn_x
-    self.avatar_y = avatar[:y] || level.spawn_y
+    self.avatar_x = avatar[:x] || (persisted? ? avatar_x : level.spawn_x)
+    self.avatar_y = avatar[:y] || (persisted? ? avatar_y : level.spawn_y)
     self.lives = lives || self.lives
     self.elapsed_seconds = elapsed_seconds || self.elapsed_seconds
     self
@@ -52,7 +59,9 @@ class LevelProgress < ApplicationRecord
   def as_detail
     {
       level_code: level.code,
-      puntaje: score,
+      puntaje: total_points,
+      puntaje_misiones: mission_score,
+      puntaje_nivel: score,
       exploracion_pct: exploration_pct,
       checkpoints_alcanzados: checkpoints_reached,
       misiones_completadas: missions_completed,

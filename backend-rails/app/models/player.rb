@@ -15,16 +15,35 @@ class Player < ApplicationRecord
   # RF-05 (escritura). Registra el resultado de un nivel y devuelve las
   # insignias que se otorgaron en esta llamada; las que el jugador ya tenia y
   # las que no existen en el catalogo simplemente no aparecen en la lista.
-  def register_level_result(level:, score: 0, missions_completed: 0,
-                            completed: false, badge_keys: [])
+  def register_level_result(level:, score: 0, completed: false, badge_keys: [])
     awarded = []
 
     transaction do
       progress = level_progresses.find_or_initialize_by(level: level)
-      progress.keep_best(score: score, missions_completed: missions_completed,
-                         completed: completed)
+      progress.keep_best(score: score, completed: completed)
       progress.save!
       awarded = award(badge_keys)
+      recalculate_totals!
+    end
+
+    awarded
+  end
+
+  # Vuelca en el progreso del nivel lo que el jugador lleva ganado en sus
+  # trivias y le otorga la insignia de las misiones que haya completado.
+  # Se llama despues de cada respuesta, asi el ranking refleja el juego real
+  # sin depender de que el cliente reporte el puntaje por su cuenta.
+  def sync_missions(level)
+    awarded = []
+
+    transaction do
+      resueltas = level.missions.active.select { |mission| mission.solved_by?(self) }
+      progress = level_progresses.find_or_initialize_by(level: level)
+      progress.mission_score = mission_points_in(level)
+      progress.missions_completed = resueltas.size
+      progress.save!
+
+      awarded = award(resueltas.filter_map { |mission| mission.badge&.key })
       recalculate_totals!
     end
 
@@ -40,9 +59,15 @@ class Player < ApplicationRecord
 
   def recalculate_totals!
     update!(
-      total_score: level_progresses.sum(:score),
+      total_score: level_progresses.sum(:score) + level_progresses.sum(:mission_score),
       levels_completed: level_progresses.where(completed: true).count
     )
+  end
+
+  def mission_points_in(level)
+    mission_answers.joins(:mission)
+                   .where(missions: { level_id: level.id })
+                   .sum(:points_awarded)
   end
 
   # Promedio de exploracion sobre los niveles jugados. Precarga los checkpoints

@@ -54,7 +54,8 @@ Respuesta: `{ "message": "estado_guardado", "state": { ...ver abajo... } }`
 
 ### `GET /levels/:code/state?player_id=` → 200
 ```json
-{ "level_code": "FIEC-01", "puntaje": 20, "exploracion_pct": 66.67,
+{ "level_code": "FIEC-01", "puntaje": 30,
+  "puntaje_misiones": 20, "puntaje_nivel": 10, "exploracion_pct": 66.67,
   "checkpoints_alcanzados": ["FIEC-01-CP1", "FIEC-01-CP2"],
   "misiones_completadas": 1, "avatar": { "x": 1180, "y": 600 },
   "vidas": 3, "segundos_jugados": 42,
@@ -63,12 +64,12 @@ Respuesta: `{ "message": "estado_guardado", "state": { ...ver abajo... } }`
 
 ## RF-02 · Selector de niveles — Kevin Gálvez
 
-### `GET /levels?zona=&mundo=`
+### `GET /levels?zona=&mundo=&player_id=`
 ```json
-{ "count": 3, "filters": { "zona": null, "mundo": null },
+{ "count": 3, "filters": { "zona": null, "mundo": null }, "player_id": 2,
   "levels": [ { "code": "FIEC-01", "name": "...", "zone": "FIEC",
                 "world": "Zona Norte", "order": 1, "difficulty": "facil",
-                "required_score": 0, "description": "...",
+                "required_score": 0, "desbloqueado": true, "description": "...",
                 "checkpoints_count": 3 } ] }
 ```
 
@@ -84,6 +85,8 @@ Respuesta: `{ "message": "estado_guardado", "state": { ...ver abajo... } }`
                   "estado": "pendiente" } ] }
 ```
 `estado`: `pendiente` | `resuelta` | `desconocido` (si no se envía `player_id`).
+`desbloqueado` compara el puntaje total del jugador con `required_score`; sin
+`player_id` el catálogo se devuelve completo como desbloqueado.
 
 ### `GET /missions/:code`
 Igual que la fila anterior más `level_code` y `questions`. **Nunca** incluye la
@@ -107,13 +110,16 @@ opción correcta.
               "question_id": 1, "selected_option": 0, "correcta": true,
               "puntaje_otorgado": 10, "intento": 1, "respondida_el": "..." },
   "feedback": "¡Correcto! ...",
+  "insignias_otorgadas": ["insignia_fiec"],
   "resumen_mision": { "mission_code": "M-FIEC-01", "puntaje_obtenido": 10,
                       "puntaje_maximo": 20, "preguntas_correctas": 1,
                       "preguntas_totales": 2, "completada": false,
                       "insignia": "insignia_fiec" } }
 ```
 El puntaje se otorga **una sola vez por pregunta**: los reintentos se registran
-con `puntaje_otorgado: 0`.
+con `puntaje_otorgado: 0`. Al completar la misión el backend **otorga la insignia
+por su cuenta** y suma los puntos al progreso del nivel, así que aparecen en el
+ranking sin necesidad de un `POST /progress`.
 
 ### `GET /players/:id/answers`
 Historial completo del jugador con su puntaje acumulado.
@@ -123,7 +129,7 @@ Historial completo del jugador con su puntaje acumulado.
 ### `POST /progress` → 201
 ```json
 { "player_id": 2, "level_code": "FIEC-01", "score": 20,
-  "missions_completed": 1, "completed": true,
+  "completed": true,
   "badges": ["insignia_fiec", "insignia_novato"] }
 ```
 ```json
@@ -133,6 +139,11 @@ Historial completo del jugador con su puntaje acumulado.
 ```
 El puntaje **nunca baja**: se conserva el mejor intento. `insignias_otorgadas`
 lista solo las nuevas; las repetidas y las que no existen no aparecen.
+`missions_completed` no se recibe: se deriva de las respuestas de trivia.
+
+El puntaje de un nivel es `puntaje_nivel` (lo que envía este endpoint) más
+`puntaje_misiones` (lo que el jugador ganó en las trivias). Cada uno lo escribe
+un solo camino.
 
 ### `GET /progress/:player_id`
 ```json
@@ -167,3 +178,15 @@ Orden: puntaje total, luego niveles superados, luego nickname.
 | POST | `/players` | `{ nickname, email, facultad }` → 201 |
 
 Facultades válidas: `FIEC` `FCNM` `FICT` `FIMCP` `FCSH` `FADCOM` `FIMCBOR` `FCV`.
+
+## Errores comunes
+
+| Situación | Código | `error` |
+|---|---|---|
+| Falta un campo obligatorio | 400 | `campos_requeridos` |
+| Recurso inexistente | 404 | `recurso_no_encontrado` |
+| Validación del modelo | 422 | `datos_invalidos` |
+| Un número llegó con basura (`"abc"`) | 422 | `valor_numerico_invalido` |
+| Checkpoint que no existe en el nivel | 422 | `checkpoints_invalidos` |
+| Opción fuera de rango | 422 | `opcion_invalida` |
+| La pregunta no pertenece a la misión | 422 | `pregunta_no_pertenece_a_la_mision` |

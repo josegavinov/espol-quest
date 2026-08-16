@@ -22,12 +22,12 @@ curl -s "$BASE/badges" | pp
 
 titulo "RF-05 (escritura) POST /progress — registra nivel superado e insignias"
 curl -s -X POST "$BASE/progress" -H 'Content-Type: application/json' \
-  -d '{"player_id":2,"level_code":"FIEC-01","score":20,"missions_completed":1,
+  -d '{"player_id":2,"level_code":"FIEC-01","score":20,
        "completed":true,"badges":["insignia_fiec","insignia_novato"]}' | pp
 
 titulo "RF-05 (escritura) POST /progress — segundo nivel del mismo jugador"
 curl -s -X POST "$BASE/progress" -H 'Content-Type: application/json' \
-  -d '{"player_id":2,"level_code":"BIB-01","score":30,"missions_completed":1,
+  -d '{"player_id":2,"level_code":"BIB-01","score":30,
        "completed":true,"badges":["insignia_lector"]}' | pp
 
 titulo "RF-05 (escritura) Reenvío con menor puntaje — se conserva el mejor intento"

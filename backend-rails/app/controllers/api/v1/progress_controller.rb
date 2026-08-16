@@ -11,8 +11,7 @@ module Api
 
         awarded = player.register_level_result(
           level: level,
-          score: progress_params[:score],
-          missions_completed: progress_params[:missions_completed],
+          score: integer_param(progress_params[:score], default: 0),
           completed: progress_params[:completed],
           badge_keys: Array(progress_params[:badges])
         )
@@ -34,8 +33,8 @@ module Api
       def progress_params
         params.require(:player_id)
         params.require(:level_code)
-        params.permit(:player_id, :level_code, :score, :missions_completed,
-                      :completed, badges: [])
+        # missions_completed no se recibe: se deriva de las respuestas de trivia.
+        params.permit(:player_id, :level_code, :score, :completed, badges: [])
       end
     end
   end

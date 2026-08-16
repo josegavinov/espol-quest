@@ -5,16 +5,18 @@
 module Api
   module V1
     class LevelsController < ApplicationController
-      # GET /api/v1/levels?zona=FIEC&mundo=Zona%20Norte
+      # GET /api/v1/levels?zona=FIEC&mundo=Zona%20Norte&player_id=2
       def index
         levels = Level.active
         levels = levels.where(zone: params[:zona]) if params[:zona].present?
         levels = levels.where(world: params[:mundo]) if params[:mundo].present?
+        player = Player.find_by(id: params[:player_id])
 
         render json: {
           count: levels.size,
           filters: { zona: params[:zona], mundo: params[:mundo] },
-          levels: levels.map(&:as_summary)
+          player_id: player&.id,
+          levels: levels.map { |level| level.as_summary(player) }
         }
       end
 
@@ -34,11 +36,12 @@ module Api
           return render json: { error: "checkpoints_invalidos", detalle: desconocidos }, status: 422
         end
 
+        avatar = state_params.fetch(:avatar, {})
         progress.apply_state(
-          avatar: state_params.fetch(:avatar, {}),
+          avatar: { x: integer_param(avatar[:x]), y: integer_param(avatar[:y]) },
           checkpoints_reached: state_params[:checkpoints_reached],
-          lives: state_params[:lives],
-          elapsed_seconds: state_params[:elapsed_seconds]
+          lives: integer_param(state_params[:lives]),
+          elapsed_seconds: integer_param(state_params[:elapsed_seconds])
         ).save!
 
         render json: { message: "estado_guardado", state: progress.as_detail }, status: 201

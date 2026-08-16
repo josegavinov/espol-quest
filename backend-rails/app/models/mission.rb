@@ -16,14 +16,17 @@ class Mission < ApplicationRecord
     questions.sum(&:points)
   end
 
-  # RF-03 (escritura). Registra la respuesta del jugador. El puntaje se otorga
-  # una sola vez por pregunta: los reintentos quedan registrados pero valen 0.
+  # RF-03 (escritura). Registra la respuesta del jugador y actualiza su progreso
+  # en el nivel. El puntaje se otorga una sola vez por pregunta: los reintentos
+  # quedan registrados pero valen 0.
+  #
+  # Devuelve la respuesta y las insignias que se otorgaron con ella.
   def register_answer(player:, question:, selected_option:)
     previous = player.mission_answers.where(question: question).order(:attempt).last
     ya_puntuada = previous&.correct? || false
     acerto = selected_option == question.correct_option
 
-    player.mission_answers.create!(
+    answer = player.mission_answers.create!(
       mission: self,
       question: question,
       selected_option: selected_option,
@@ -32,6 +35,8 @@ class Mission < ApplicationRecord
       attempt: (previous&.attempt || 0) + 1,
       answered_at: Time.current
     )
+
+    [answer, player.sync_missions(level)]
   end
 
   # Estado de la mision para un jugador: cuanto lleva y si ya la completo.
