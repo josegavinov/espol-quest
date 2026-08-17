@@ -1,6 +1,4 @@
 // Paleta de cada zona del campus; el nivel elige la suya con su background_key.
-// Los tres niveles son interiores: pared, techo, piso y lo que se ve por la
-// ventana.
 export interface Theme {
   pared: number
   paredZocalo: number

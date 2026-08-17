@@ -3,7 +3,6 @@
 
 import { formatTime } from "../../format"
 
-// Los corazones perdidos quedan vacios en vez de desaparecer.
 const VIDAS_MOSTRADAS = 3
 
 interface Props {

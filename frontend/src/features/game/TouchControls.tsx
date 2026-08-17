@@ -1,5 +1,4 @@
 // Controles tactiles: D-pad a la izquierda, botones A y B a la derecha.
-// En teclado: flechas o WASD, espacio para saltar, E para interactuar.
 interface Props {
   onLeft: (activo: boolean) => void
   onRight: (activo: boolean) => void

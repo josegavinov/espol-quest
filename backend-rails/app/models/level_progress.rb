@@ -1,9 +1,7 @@
-# Avance de un jugador dentro de un nivel: estado de la partida (posicion,
-# vidas, checkpoints alcanzados) y resultado (puntaje, nivel superado).
+# Avance de un jugador dentro de un nivel: estado de la partida y resultado.
 #
-# El puntaje del nivel tiene dos origenes y cada uno lo escribe un solo camino:
-# mission_score se deriva de las respuestas de trivia, score lo envia el juego
-# al terminar el nivel. total_points es la suma.
+# El puntaje tiene dos origenes: mission_score sale de las respuestas de trivia
+# y score lo envia el juego al terminar el nivel.
 class LevelProgress < ApplicationRecord
   belongs_to :player
   belongs_to :level
@@ -25,9 +23,7 @@ class LevelProgress < ApplicationRecord
     self.completed_at ||= Time.current
   end
 
-  # Guarda la partida dentro del nivel. Los checkpoints se acumulan sin
-  # duplicarlos, respetando el orden en que aparecen en el nivel; lo que no se
-  # envia conserva su valor anterior, y si nunca hubo posicion se usa el spawn.
+  # Guarda la partida. Lo que no se envia conserva su valor anterior.
   def apply_state(avatar: {}, checkpoints_reached: [], lives: nil, elapsed_seconds: nil)
     reach(checkpoints_reached)
     self.avatar_x = avatar[:x] || (persisted? ? avatar_x : level.spawn_x)
@@ -47,8 +43,7 @@ class LevelProgress < ApplicationRecord
     Array(codes) - level.checkpoint_codes
   end
 
-  # Se deriva de los checkpoints alcanzados en vez de guardarse, para que no
-  # pueda quedar desincronizado con ellos.
+  # Se deriva de los checkpoints alcanzados en vez de guardarse.
   def exploration_pct
     total = level.checkpoints.size
     return 0.0 if total.zero?

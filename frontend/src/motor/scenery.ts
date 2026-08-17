@@ -71,8 +71,7 @@ export function createStudent(escena: Phaser.Scene) {
   })
 }
 
-// Interior del bloque: pared, techo con luminarias, ventanales y puertas de
-// aulas. Sin parallax, porque una puerta no se mueve del pasillo.
+// Interior del bloque: pared, techo, ventanales y puertas de aulas.
 export function drawInterior(escena: Phaser.Scene, nivel: LevelScene, tema: Theme) {
   const { bounds } = nivel
       const piso = 660                    // altura del suelo del nivel
@@ -82,7 +81,6 @@ export function drawInterior(escena: Phaser.Scene, nivel: LevelScene, tema: Them
   escena.add.rectangle(bounds.width / 2, bounds.height / 2, bounds.width, bounds.height, tema.pared)
     .setDepth(-40)
 
-  // Techo con luminarias colgadas.
   const techo = piso - STUDENT_HEIGHT * 5
   escena.add.rectangle(bounds.width / 2, techo - 10, bounds.width, 20, tema.techo).setDepth(-39)
   escena.add.rectangle(bounds.width / 2, techo, bounds.width, 3, tema.paredZocalo, 0.6).setDepth(-39)
@@ -92,7 +90,6 @@ export function drawInterior(escena: Phaser.Scene, nivel: LevelScene, tema: Them
     escena.add.rectangle(x, techo + 52, 90, 46, 0xfff6d0, 0.10).setDepth(-38)
   }
 
-  // Ventanas altas hacia el campus.
   for (let x = 150; x < bounds.width; x += 300) {
     const vy = piso - STUDENT_HEIGHT * 3.4
     const vw = STUDENT_HEIGHT * 2, vh = STUDENT_HEIGHT * 1.5
@@ -104,7 +101,6 @@ export function drawInterior(escena: Phaser.Scene, nivel: LevelScene, tema: Them
     escena.add.rectangle(x, vy, vw, 4, tema.paredZocalo).setDepth(-34)
   }
 
-  // Puertas de aulas, apoyadas en el suelo.
   for (let i = 0; i * 300 < bounds.width; i++) {
     const x = 300 + i * 300
     escena.add.rectangle(x, piso - altoPuerta / 2, anchoPuerta + 8, altoPuerta + 8, tema.paredZocalo)
@@ -117,7 +113,6 @@ export function drawInterior(escena: Phaser.Scene, nivel: LevelScene, tema: Them
     }).setOrigin(0.5).setDepth(-30)
   }
 
-  // Zocalo al pie de la pared.
   escena.add.rectangle(bounds.width / 2, piso - 6, bounds.width, 12, tema.paredZocalo, 0.55)
     .setDepth(-29)
 }

@@ -1,5 +1,4 @@
-// Reglas de la partida: carga el nivel, lleva el marcador, decide que pasa al
-// alcanzar cada punto de interes y guarda el avance.
+// Reglas de la partida: marcador, avance y que pasa en cada punto de interes.
 import { useCallback, useEffect, useRef, useState } from "react"
 import { api } from "../../api/client"
 import type { Checkpoint, LevelScene, Player } from "../../api/types"
@@ -7,8 +6,7 @@ import type { CampusScene, CampusSceneEvents, Controls } from "../../motor/Campu
 
 export const INITIAL_LIVES = 3
 
-// Estado con referencia al valor actual: la escena recibe sus callbacks una
-// sola vez y el estado normal se le quedaria congelado.
+// Estado con referencia al valor actual, para leerlo desde los callbacks.
 function useEstadoVivo<T>(inicial: T) {
   const [valor, setValor] = useState(inicial)
   const ref = useRef(valor)
