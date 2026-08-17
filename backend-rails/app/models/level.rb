@@ -1,6 +1,7 @@
 # Nivel de plataformas que representa una zona del campus.
 # RF-01 escenario y fisicas, RF-02 selector de niveles.
 class Level < ApplicationRecord
+  belongs_to :badge, optional: true
   has_many :platforms, dependent: :destroy
   has_many :checkpoints, -> { order(:order_index) }, dependent: :destroy
   has_many :missions, dependent: :destroy
@@ -31,8 +32,32 @@ class Level < ApplicationRecord
       order: order_index,
       difficulty: difficulty,
       required_score: required_score,
+      insignia: badge&.key,
       desbloqueado: player.nil? || unlocked_for?(player),
       description: description,
+      checkpoints_count: checkpoints.size
+    }
+  end
+
+  # Vista del CMS con todos los campos editables del nivel.
+  def as_admin
+    {
+      code: code,
+      name: name,
+      zone: zone,
+      world: world,
+      order_index: order_index,
+      description: description,
+      difficulty: difficulty,
+      required_score: required_score,
+      active: active,
+      width: width,
+      height: height,
+      gravity_y: gravity_y,
+      spawn_x: spawn_x,
+      spawn_y: spawn_y,
+      background_key: background_key,
+      badge_key: badge&.key,
       checkpoints_count: checkpoints.size
     }
   end

@@ -9,6 +9,20 @@ class Checkpoint < ApplicationRecord
   validates :code, uniqueness: true
   validates :kind, inclusion: { in: KINDS }
 
+  # Vista del CMS: mismos datos, pero planos para editarlos en un formulario.
+  def as_admin
+    {
+      code: code,
+      level_code: level.code,
+      name: name,
+      x: x,
+      y: y,
+      kind: kind,
+      info_text: info_text,
+      order_index: order_index
+    }
+  end
+
   def as_detail
     {
       code: code,
