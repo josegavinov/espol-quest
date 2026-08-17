@@ -14,7 +14,7 @@ import { usePlayer } from "./session"
 import { RotateNotice } from "./ui/RotateNotice"
 
 export default function App() {
-  const { player, setPlayer, logout } = usePlayer()
+  const { player, setPlayer, refresh, logout } = usePlayer()
   const [pantalla, setScreen] = useState<Screen>("menu")
   const [levelCode, setLevelCode] = useState<string | null>(null)
 
@@ -39,7 +39,10 @@ export default function App() {
         <GameScreen
           player={player}
           levelCode={levelCode}
-          onSalir={() => setScreen("mapa")}
+          onSalir={() => {
+            void refresh()
+            setScreen("mapa")
+          }}
         />
       </>
     )

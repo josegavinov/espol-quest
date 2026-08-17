@@ -1,5 +1,6 @@
 // Quien esta jugando. Se guarda en localStorage para no repetir el registro.
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { api } from "./api/client"
 import type { Player } from "./api/types"
 
 const CLAVE = "espol-quest:player"
@@ -24,5 +25,24 @@ export function usePlayer() {
     else localStorage.removeItem(CLAVE)
   }, [player])
 
-  return { player, setPlayer, logout: () => setPlayer(null) }
+  const refresh = useCallback(async () => {
+    const id = player?.player_id
+    if (!id) return
+
+    try {
+      const perfil = await api.profile(id)
+      setPlayer({
+        player_id: perfil.player_id,
+        nickname: perfil.nickname,
+        facultad: perfil.facultad,
+        puntaje_total: perfil.puntaje_total,
+        niveles_superados: perfil.niveles_superados,
+        insignias: perfil.insignias.length,
+      })
+    } catch {
+      return
+    }
+  }, [player?.player_id])
+
+  return { player, setPlayer, refresh, logout: () => setPlayer(null) }
 }
