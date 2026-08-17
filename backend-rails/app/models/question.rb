@@ -14,7 +14,21 @@ class Question < ApplicationRecord
     acerto ? feedback_ok : feedback_fail
   end
 
-  # Se omite correct_option a proposito: el cliente no debe conocer la respuesta.
+  # Vista del CMS: aqui si se expone la respuesta correcta.
+  def as_admin
+    {
+      id: id,
+      statement: statement,
+      options: options,
+      correct_option: correct_option,
+      points: points,
+      feedback_ok: feedback_ok,
+      feedback_fail: feedback_fail,
+      order_index: order_index
+    }
+  end
+
+  # Se omite correct_option: el cliente no debe conocer la respuesta.
   def as_detail
     {
       id: id,

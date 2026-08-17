@@ -24,6 +24,31 @@ Rails.application.routes.draw do
       get  "players",             to: "players#index"
       post "players",             to: "players#create"
       get  "players/:id/answers", to: "players#answers"
+
+      # CMS: administracion de contenido del juego.
+      namespace :admin do
+        # Misiones, preguntas y opciones de respuesta (Jose Gavino)
+        get    "missions",              to: "missions#index"
+        post   "missions",              to: "missions#create"
+        patch  "missions/:code",        to: "missions#update"
+        delete "missions/:code",        to: "missions#destroy"
+
+        get    "missions/:mission_code/questions", to: "questions#index"
+        post   "missions/:mission_code/questions", to: "questions#create"
+        patch  "questions/:id",            to: "questions#update"
+        delete "questions/:id",            to: "questions#destroy"
+
+        # Niveles y puntos de interes del campus (Kevin Galvez)
+        get    "levels",       to: "levels#index"
+        post   "levels",       to: "levels#create"
+        patch  "levels/:code", to: "levels#update"
+        delete "levels/:code", to: "levels#destroy"
+
+        get    "levels/:level_code/checkpoints", to: "checkpoints#index"
+        post   "levels/:level_code/checkpoints", to: "checkpoints#create"
+        patch  "checkpoints/:checkpoint_code", to: "checkpoints#update"
+        delete "checkpoints/:checkpoint_code", to: "checkpoints#destroy"
+      end
     end
   end
 end

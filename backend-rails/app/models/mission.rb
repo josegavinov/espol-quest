@@ -16,11 +16,9 @@ class Mission < ApplicationRecord
     questions.sum(&:points)
   end
 
-  # RF-03 (escritura). Registra la respuesta del jugador y actualiza su progreso
-  # en el nivel. El puntaje se otorga una sola vez por pregunta: los reintentos
-  # quedan registrados pero valen 0.
-  #
-  # Devuelve la respuesta y las insignias que se otorgaron con ella.
+  # RF-03 (escritura). Registra la respuesta y actualiza el progreso del nivel.
+  # El puntaje se otorga una sola vez por pregunta: los reintentos valen 0.
+  # Devuelve la respuesta y las insignias otorgadas.
   def register_answer(player:, question:, selected_option:)
     previous = player.mission_answers.where(question: question).order(:attempt).last
     ya_puntuada = previous&.correct? || false
@@ -73,6 +71,22 @@ class Mission < ApplicationRecord
       max_points: max_points,
       insignia: badge&.key,
       order: order_index
+    }
+  end
+
+  # Vista del CMS: incluye lo editable, incluido el estado activo.
+  def as_admin
+    {
+      code: code,
+      level_code: level.code,
+      checkpoint_code: checkpoint&.code,
+      badge_key: badge&.key,
+      title: title,
+      description: description,
+      kind: kind,
+      order_index: order_index,
+      active: active,
+      questions_count: questions.size
     }
   end
 
