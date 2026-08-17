@@ -1,5 +1,4 @@
 # Jugador: identidad, progreso acumulado e insignias.
-# Es el unico dueno de la identidad del jugador en todo el sistema.
 class Player < ApplicationRecord
   FACULTADES = %w[FIEC FCNM FICT FIMCP FCSH FADCOM FIMCBOR FCV].freeze
 
@@ -13,8 +12,7 @@ class Player < ApplicationRecord
   validates :facultad, presence: true, inclusion: { in: FACULTADES }
 
   # RF-05 (escritura). Registra el resultado de un nivel y devuelve las
-  # insignias que se otorgaron en esta llamada; las que el jugador ya tenia y
-  # las que no existen en el catalogo simplemente no aparecen en la lista.
+  # insignias otorgadas, incluida la que declara el nivel al superarlo.
   def register_level_result(level:, score: 0, completed: false, badge_keys: [])
     awarded = []
 
@@ -22,17 +20,18 @@ class Player < ApplicationRecord
       progress = level_progresses.find_or_initialize_by(level: level)
       progress.keep_best(score: score, completed: completed)
       progress.save!
-      awarded = award(badge_keys)
+
+      claves = Array(badge_keys)
+      claves << level.badge.key if progress.completed? && level.badge
+      awarded = award(claves)
       recalculate_totals!
     end
 
     awarded
   end
 
-  # Vuelca en el progreso del nivel lo que el jugador lleva ganado en sus
-  # trivias y le otorga la insignia de las misiones que haya completado.
-  # Se llama despues de cada respuesta, asi el ranking refleja el juego real
-  # sin depender de que el cliente reporte el puntaje por su cuenta.
+  # Vuelca en el progreso del nivel lo ganado en las trivias y otorga la
+  # insignia de las misiones completadas.
   def sync_missions(level)
     awarded = []
 
@@ -70,8 +69,7 @@ class Player < ApplicationRecord
                    .sum(:points_awarded)
   end
 
-  # Promedio de exploracion sobre los niveles jugados. Precarga los checkpoints
-  # porque cada nivel los necesita para calcular su porcentaje.
+  # Promedio de exploracion sobre los niveles jugados.
   def exploration_pct
     jugados = progress_with_checkpoints
     return 0.0 if jugados.empty?
@@ -110,8 +108,6 @@ class Player < ApplicationRecord
 
   private
 
-  # Sin memoizar a proposito: guardar el resultado en la instancia lo dejaria
-  # obsoleto en cuanto se registre un nivel nuevo sobre el mismo objeto.
   def progress_with_checkpoints
     level_progresses.includes(level: :checkpoints).to_a
   end

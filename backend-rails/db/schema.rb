@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
+ActiveRecord::Schema[7.1].define(version: 2026_08_17_093412) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -77,6 +77,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
     t.string "background_key", default: "campus_day", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "badge_id"
+    t.index ["badge_id"], name: "index_levels_on_badge_id"
     t.index ["code"], name: "index_levels_on_code", unique: true
   end
 
@@ -170,6 +172,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_08_16_173512) do
   add_foreign_key "checkpoints", "levels"
   add_foreign_key "level_progresses", "levels"
   add_foreign_key "level_progresses", "players"
+  add_foreign_key "levels", "badges"
   add_foreign_key "mission_answers", "missions"
   add_foreign_key "mission_answers", "players"
   add_foreign_key "mission_answers", "questions"
