@@ -15,7 +15,7 @@ BADGES = [
 PLAYERS = [
   { nickname: "kevin_g",  email: "kagalvez@espol.edu.ec",  facultad: "FIEC" },
   { nickname: "jose_g",   email: "jgavino@espol.edu.ec",   facultad: "FIEC" },
-  { nickname: "jorge_dc", email: "jdelcampo@espol.edu.ec", facultad: "FCNM" },
+  { nickname: "jorge_dc", email: "jordecampo@espol.edu.ec", facultad: "FCNM" },
   { nickname: "novato01", email: "novato01@espol.edu.ec",  facultad: "FIMCP" }
 ].freeze
 
@@ -54,7 +54,7 @@ LEVELS = [
   {
     code: "BIB-01", badge_key: "insignia_lector",
     name: "Biblioteca Central", zone: "Biblioteca",
-    world: "Zona Central", order_index: 2, difficulty: "media", required_score: 30,
+    world: "Zona Central", order_index: 2, difficulty: "media", required_score: 20,
     description: "Explora la Biblioteca Central, sus salas de estudio y el " \
                  "servicio de préstamo de libros.",
     width: 2000, height: 720, gravity_y: 900,
@@ -81,7 +81,7 @@ LEVELS = [
   {
     code: "BE-01", badge_key: "insignia_bienestar",
     name: "Bienestar Estudiantil", zone: "Bienestar Estudiantil",
-    world: "Zona Central", order_index: 3, difficulty: "media", required_score: 60,
+    world: "Zona Central", order_index: 3, difficulty: "media", required_score: 45,
     description: "Ubica las oficinas de Bienestar Estudiantil y conoce los " \
                  "servicios de becas y apoyo psicológico.",
     width: 1800, height: 720, gravity_y: 900,
