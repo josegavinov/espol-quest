@@ -15,9 +15,9 @@ Gustavo Galindo. Proyecto de la materia **Lenguajes de Programación** (ESPOL).
 
 ```
    ┌──────────────────────────────┐        ┌─────────────────────────────┐
-   │ Frontend (Phaser.js + React) │ ─REST→ │ backend-rails               │
-   │ PWA sobre Canvas HTML5       │  JSON  │ Ruby on Rails 7.1 (API)     │
-   │ pendiente: Avance 2          │ ←──────│ niveles, misiones, progreso,│
+   │ frontend                     │ ─REST→ │ backend-rails               │
+   │ React + TypeScript + Phaser  │  JSON  │ Ruby on Rails 7.1 (API)     │
+   │ PWA sobre Canvas HTML5 :5173 │ ←──────│ niveles, misiones, progreso,│
    └──────────────────────────────┘        │ insignias y ranking · :3000 │
                                            └─────────────────────────────┘
 ```
@@ -40,7 +40,7 @@ Gustavo Galindo. Proyecto de la materia **Lenguajes de Programación** (ESPOL).
 
 Requisitos: **Ruby 3.2** (`ruby -v`) y **PostgreSQL 15**.
 
-### Base de datos
+### 1. Backend · Base de datos
 
 La forma más rápida, igual en los tres sistemas operativos, es un contenedor:
 
@@ -89,6 +89,35 @@ bin/rails server -p 3000     # http://127.0.0.1:3000
 ```
 
 Comprobación: <http://127.0.0.1:3000/api/v1/health>
+
+### 2. Frontend
+
+Requisito: **Node 20 o superior** (`node -v`).
+
+```bash
+cd frontend
+cp .env.example .env          # solo la primera vez
+npm install
+npm run dev                   # http://localhost:5173
+```
+
+El backend debe estar levantado: el frontend lo consume en el puerto 3000, y el
+origen `http://localhost:5173` ya está permitido por CORS. Para apuntar a otra
+dirección, cambien `VITE_API_URL` en el `.env`.
+
+Estructura, pensada para que los tres trabajemos en paralelo sin conflictos:
+
+| Carpeta | Contenido | Responsable |
+|---|---|---|
+| `src/api/` | cliente HTTP y tipos del contrato | compartido |
+| `src/features/login/` | inicio y registro del jugador | compartido |
+| `src/motor/`, `src/features/game/`, `src/features/levels/` | escena Phaser, partida y selector de niveles | Kevin Gálvez |
+| `src/features/missions/` | catálogo de misiones y trivia | José Gaviño |
+| `src/features/profile/`, `src/features/ranking/` | perfil y tabla de clasificación | Jorge del Campo |
+| `src/features/admin/` | CMS de contenido | José Gaviño / Kevin Gálvez |
+
+Nadie usa `fetch` directamente: todo pasa por `src/api/client.ts`, así la URL
+base, el manejo de errores y los tipos viven en un solo lugar.
 
 ## Probar los endpoints
 
@@ -144,7 +173,8 @@ curl "http://127.0.0.1:3000/api/v1/ranking?facultad=FIEC"
 
 ## Convenciones de código
 
-- Código y base de datos en inglés; claves del JSON de la API en español.
+- Nombres públicos (archivos, componentes, tipos, props) en inglés; variables
+  locales y comentarios en español; claves del JSON de la API en español.
 - Los controladores solo traducen HTTP; la lógica de negocio vive en los modelos.
 - Un dato se escribe en un solo lugar: las insignias, las facultades y la
   identidad del jugador tienen una única fuente de verdad.
@@ -153,5 +183,4 @@ curl "http://127.0.0.1:3000/api/v1/ranking?facultad=FIEC"
 ## Pendiente para el Avance 2
 
 - Frontend Phaser.js + React (TypeScript) como PWA sobre Canvas HTML5.
-- CMS de administración de trivias.
-- Autenticación (JWT) y pruebas automatizadas (minitest).
+- CMS de administración de contenido: CRUD de misiones, preguntas y puntos de interés.
