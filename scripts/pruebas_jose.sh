@@ -6,7 +6,13 @@ set -u
 BASE="${BASE:-http://127.0.0.1:3000/api/v1}"
 PLAYER="${PLAYER:-2}"
 
-pp() { python3 -m json.tool 2>/dev/null || cat; }
+# Se guarda la entrada antes de formatearla: si el backend esta caido la
+# respuesta llega vacia y sin el buffer el script no imprimiria nada.
+pp() {
+  local cuerpo; cuerpo=$(cat)
+  printf '%s' "$cuerpo" | python3 -m json.tool 2>/dev/null ||
+    printf '%s\n' "${cuerpo:-(sin respuesta: ¿el backend esta levantado?)}"
+}
 titulo() { printf '\n\033[1;36m%s\033[0m\n' "── $1"; }
 
 echo "=============================================================="
